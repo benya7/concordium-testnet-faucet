@@ -1,118 +1,219 @@
 import Image from "next/image";
-import { Inter } from "next/font/google";
+import { IBM_Plex_Mono } from "next/font/google";
+import poweredByConcordium from "../../public/powered_by_concordium_light.png";
+import { useEffect, useState } from "react";
+import { SingleInputForm } from "@/components/SingleInpuForm";
+import { extractITweetdFromUrl, formatTimestamp, formatTxHash } from "@/lib/utils";
+import { ErrorAlert } from "@/components/ErrorAlert";
+import getLatestTransactions from "@/lib/getLatestTransactions";
+import { AccountAddress } from "@concordium/web-sdk";
 
-const inter = Inter({ subsets: ["latin"] });
+const IBMPlexMono = IBM_Plex_Mono({ weight: ["400", "600", "700"], subsets: ["latin"], display: "swap", variable: "--font-ibm-plex-mono"});
+
 
 export default function Home() {
+  const [latestTransactions, setLatestTransactions] = useState<PartialTransaction[]>([]);
+  const [address, setAddress] = useState<string>("");
+  const [addressValidationError, setAddressValidationError] = useState<string | undefined>();
+
+  const [tweetPostedUrl, setTweetPostedUrl] = useState('');
+  const [tweetPostedId, setTweetPostedId] = useState<string | undefined>();
+
+  const [isValidTweetUrl, setIsValidTweetUrl] = useState<boolean | undefined>();
+  const [isValidVerification, setIsValidVerification] = useState<boolean | undefined>();
+  const [transactionHash, setTransactionHash] = useState<string | undefined>();
+  
+  const [error, setError] = useState<string | undefined>();
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => setAddress(e.target.value);
+
+  const handleTweetUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsValidTweetUrl(undefined)
+    setIsValidVerification(undefined)
+
+    setTweetPostedUrl(e.target.value)
+    const tweetId = extractITweetdFromUrl(e.target.value)
+    if (!tweetId) {
+      setIsValidTweetUrl(false)
+    } else {
+      setIsValidTweetUrl(true)
+      setTweetPostedId(tweetId)
+    }
+  };
+
+  const handlePostTweet = () => {
+    // const tweetTemplate = encodeURIComponent(`Excited to use testnet faucet! 🚀 Requesting 20,000 CCDs to power my blockchain experiments. ${address} Check it out! #Concordium #Blockchain #Testnet #Developers`);
+    const tweetTemplate = encodeURIComponent(`testing ${address} testing`)
+    window.open(`https://x.com/intent/tweet?text=${tweetTemplate}`, '_blank', 'width=500,height=500');
+  };
+
+  const verifyTweet = async () => {
+    try {
+      const response = await fetch('/api/verifyTweet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tweetPostedId, address }),
+      });
+  
+      const data = await response.json();
+  
+      return { ok: response.ok, data };
+    } catch (error) {
+      throw new Error("Network error. Please check your connection.");
+    }
+  };
+  
+  const sendTokens = async () => {
+    try {
+      const response = await fetch('/api/sendTokens', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sender: process.env.NEXT_PUBLIC_SENDER_ADDRESS, receiver: address }),
+      });
+  
+      const data = await response.json();
+  
+      return { ok: response.ok, data };
+    } catch (error) {
+      throw new Error("Network error. Please check your connection.");
+    }
+  };
+
+  const handleVerifyTweetAndSendTokens = async () => {
+    try {
+      const { ok: verifyOk, data: verifyData } = await verifyTweet();
+  
+      if (verifyOk) {
+        setIsValidVerification(verifyData.isValid);
+        await new Promise(resolve => setTimeout(() => resolve, 2000))
+        const { ok: sendOk, data: sendData } = await sendTokens();
+  
+        if (sendOk) {
+          setTransactionHash(sendData.transactionHash);
+        } else {
+          setError(sendData.error);
+        }
+      } else {
+        setIsValidVerification(false);
+        setError(verifyData.error);
+      }
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
+  
+  useEffect(() => {
+    if (!address) {
+      setAddressValidationError(undefined)
+      return
+    }
+    try {
+      AccountAddress.fromBase58(address);
+      setAddressValidationError(undefined)
+    } catch (error) {
+      setAddressValidationError("Invalid address. Please insert a valid one.")
+    }
+  }, [address])
+
+  useEffect(() => {
+    if (!error) {
+      return
+    }
+    setTimeout(() => {
+      setError(undefined)
+    }, 10000);
+  }, [error])
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const transactions = await getLatestTransactions();
+        setLatestTransactions(transactions);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+    fetchTransactions();
+    const intervalId = setInterval(fetchTransactions, 60000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
+      className={`flex min-h-screen flex-col items-center justify-between ${IBMPlexMono.className}`}
     >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+      <div className="h-24 w-full bg-[--teal] flex items-center justify-center sm:justify-between sm:px-10">
+        <p className="text-xl sm:text-2xl text-center font-semibold text-white">Concordium Testnet Faucet</p>
+      </div>
+      <div className="flex-1 flex flex-col items-center w-full gap-4 px-4 py-8 sm:p-14 text-sm sm:text-base">
+        <p className="mb-4">Get free CDDs for testing your dApps!</p>
+        <div className="border border-[--dark-blue] rounded-full h-9 w-9 flex items-center justify-center">
+          <p className="font-semibold">1</p>
+        </div>  
+        <SingleInputForm
+          inputValue={address}
+          handleInputValue={handleAddressChange}
+          handleSubmitButton={handlePostTweet}
+          inputPlaceHolder="Enter your testnet CCD address"
+          submitButtonText="Post Tweet"
+          inputDisabled={Boolean(tweetPostedUrl)}
+          submitButtonDisabled={!address || (address && Boolean(addressValidationError)) || Boolean(tweetPostedUrl)}
+        />
+        {addressValidationError && (
+          <p className="text-xs text-red-700 h-fit -mt-2">{addressValidationError}</p>
+        )}
+        <div className="border border-[--dark-blue] rounded-full h-9 w-9 flex items-center justify-center mt-4">
+          <p className="font-semibold">2</p>
+        </div>
+        <SingleInputForm
+          inputValue={tweetPostedUrl}
+          handleInputValue={handleTweetUrlChange}
+          handleSubmitButton={handleVerifyTweetAndSendTokens}
+          inputPlaceHolder="Enter your tweet link"
+          submitButtonText="Verify"
+          inputDisabled={!address || Boolean(addressValidationError) || isValidVerification}
+          submitButtonDisabled={!isValidTweetUrl || isValidVerification}
+        />
+        <div className="border border-[--dark-blue] rounded-full h-9 w-9 flex items-center justify-center mt-4">
+          <p className="font-semibold">3</p>
+        </div>
+        <div className="w-full flex flex-col border border-[--dark-blue] max-w-xl mb-4 p-2 px-4 items-center justify-center min-h-[160px] text-xs sm:text-sm text-center overflow-auto">
+        {isValidVerification ? (
+          <>
+            <p>Tweet Verified Succesfully ✅</p>
+            { !transactionHash ? <p>Sending token to your address..</p> : <>
+              <p>Tokens sent ✅.</p>
+              <p>Tx Hash: {transactionHash}</p>
+            </>}
+          </>
+          ) : <p>Pending to verify.</p>}
+          </div>
+        <p className="mt-8">Latest transactions:</p>
+        <div className="bg-white relative border border-[--dark-blue] overflow-auto w-full flex flex-col max-w-xl mb-4 min-h-[288px] text-xs sm:text-sm">
+          { latestTransactions.length > 0 ?
+            latestTransactions.map(tx => (
+              <div key={tx.transactionHash}  className="border-b last:border-none py-2 text-nowrap">
+                <p>{`Date: ${formatTimestamp(tx.blockTime)}`}</p>
+                <p>{`Tx Hash: ${tx.transactionHash}`}</p>
+              </div>
+            )) :
+            <p className="absolute inset-0 text-gray-400 text-center place-content-center">No transactions found.</p>
+          }
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className="h-32 w-full bg-[--blue-sapphire] flex items-center justify-center sm:px-10">
+        <Image src={poweredByConcordium} alt="powered by" className="w-72" />
       </div>
+      {error && <ErrorAlert
+        errorText={error}
+        onClose={() => setError(undefined)}
+      />}
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
     </main>
   );
 }
