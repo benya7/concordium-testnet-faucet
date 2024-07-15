@@ -1,8 +1,9 @@
+import { AccountTransactionSignature, signTransaction } from "@concordium/web-sdk";
 import type { NextApiRequest, NextApiResponse } from "next";
+
+import createAccountTransaction from "@/lib/createAccountTrasantion";
 import createGRPCNodeClient from "@/lib/createGPRCClient";
 import { getSenderAccountSigner } from "@/lib/getSenderAccountSigner";
-import createAccountTransaction from "@/lib/createAccountTrasantion";
-import { AccountTransactionSignature, signTransaction } from "@concordium/web-sdk";
 
 type Data = {
   transactionHash?: string;

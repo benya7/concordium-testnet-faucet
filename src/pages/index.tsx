@@ -1,12 +1,18 @@
-import Image from "next/image";
-import { IBM_Plex_Mono } from "next/font/google";
-import poweredByConcordium from "../../public/powered_by_concordium_light.png";
 import { useEffect, useState } from "react";
-import { SingleInputForm } from "@/components/SingleInpuForm";
-import { extractITweetdFromUrl, formatTimestamp, formatTxHash } from "@/lib/utils";
-import { ErrorAlert } from "@/components/ErrorAlert";
-import getLatestTransactions from "@/lib/getLatestTransactions";
+
 import { AccountAddress } from "@concordium/web-sdk";
+import { IBM_Plex_Mono } from "next/font/google";
+import Image from "next/image";
+
+
+
+import { ErrorAlert } from "@/components/ErrorAlert";
+import { SingleInputForm } from "@/components/SingleInpuForm";
+import getLatestTransactions from "@/lib/getLatestTransactions";
+import { extractITweetdFromUrl, formatTimestamp, formatTxHash } from "@/lib/utils";
+
+import poweredByConcordium from "../../public/powered_by_concordium_light.png";
+
 
 const IBMPlexMono = IBM_Plex_Mono({ weight: ["400", "600", "700"], subsets: ["latin"], display: "swap", variable: "--font-ibm-plex-mono"});
 
