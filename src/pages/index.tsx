@@ -97,7 +97,7 @@ export default function Home() {
   
       if (verifyOk) {
         setIsValidVerification(verifyData.isValid);
-        await new Promise(resolve => setTimeout(() => resolve, 2000))
+        await new Promise(resolve => setTimeout(resolve, 2000))
         const { ok: sendOk, data: sendData } = await sendTokens();
   
         if (sendOk) {
@@ -209,7 +209,7 @@ export default function Home() {
         </div>
       </div>
       <div className="h-32 w-full bg-[--blue-sapphire] flex items-center justify-center sm:px-10">
-        <Image src={poweredByConcordium} alt="powered by" className="w-72" />
+        <Image src={poweredByConcordium} alt="powered by" className="w-64 sm:w-72" />
       </div>
       {error && <ErrorAlert
         errorText={error}
