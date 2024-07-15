@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { AccountAddress } from "@concordium/web-sdk";
 import { IBM_Plex_Mono } from "next/font/google";
 import Image from "next/image";
-
-
+import { useMediaQuery } from "usehooks-ts";
 
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { SingleInputForm } from "@/components/SingleInpuForm";
@@ -30,7 +29,8 @@ export default function Home() {
   const [transactionHash, setTransactionHash] = useState<string | undefined>();
   
   const [error, setError] = useState<string | undefined>();
-
+  const isMobile = useMediaQuery('(max-width: 640px)')
+  
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => setAddress(e.target.value);
 
   const handleTweetUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,16 +185,13 @@ export default function Home() {
           inputDisabled={!address || Boolean(addressValidationError) || isValidVerification}
           submitButtonDisabled={!isValidTweetUrl || isValidVerification}
         />
-        <div className="border border-[--dark-blue] rounded-full h-9 w-9 flex items-center justify-center mt-4">
-          <p className="font-semibold">3</p>
-        </div>
-        <div className="w-full flex flex-col border border-[--dark-blue] max-w-xl mb-4 p-2 px-4 items-center justify-center min-h-[160px] text-xs sm:text-sm text-center overflow-auto">
+        <div className="w-full flex flex-col border border-[--dark-blue] max-w-xl mb-4 p-2 items-center justify-center min-h-[160px] text-xs sm:text-sm text-center">
         {isValidVerification ? (
           <>
-            <p>Tweet Verified Succesfully ✅</p>
+            <p className="mb-1">Tweet Verified Succesfully ✅</p>
             { !transactionHash ? <p>Sending token to your address..</p> : <>
-              <p>Tokens sent ✅.</p>
-              <p>Tx Hash: {transactionHash}</p>
+              <p className="mb-1">Tokens Sent ✅</p>
+              <p className="mb-1">{`Tx Hash: ${isMobile ? formatTxHash(transactionHash) : transactionHash}`}</p>
             </>}
           </>
           ) : <p>Pending to verify.</p>}
@@ -203,9 +200,9 @@ export default function Home() {
         <div className="bg-white relative border border-[--dark-blue] overflow-auto w-full flex flex-col max-w-xl mb-4 min-h-[288px] text-xs sm:text-sm">
           { latestTransactions.length > 0 ?
             latestTransactions.map(tx => (
-              <div key={tx.transactionHash}  className="border-b last:border-none py-2 text-nowrap">
+              <div key={tx.transactionHash}  className="border-b last:border-none py-2 mx-2">
                 <p>{`Date: ${formatTimestamp(tx.blockTime)}`}</p>
-                <p>{`Tx Hash: ${tx.transactionHash}`}</p>
+                <p>{`Tx Hash: ${isMobile ? formatTxHash(tx.transactionHash) : tx.transactionHash}`}</p>
               </div>
             )) :
             <p className="absolute inset-0 text-gray-400 text-center place-content-center">No transactions found.</p>
