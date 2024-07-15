@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 
 import { AccountAddress } from "@concordium/web-sdk";
+import { Metadata } from "next";
 import { IBM_Plex_Mono } from "next/font/google";
+import Head from "next/head";
 import Image from "next/image";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -155,6 +157,9 @@ export default function Home() {
     <main
       className={`flex min-h-screen flex-col items-center justify-between ${IBMPlexMono.className}`}
     >
+      <Head>
+        <title>Concordium Testnet Faucet</title>
+      </Head>
       <div className="h-24 w-full bg-[--teal] flex items-center justify-center sm:justify-between sm:px-10">
         <p className="text-xl sm:text-2xl text-center font-semibold text-white">Concordium Testnet Faucet</p>
       </div>
