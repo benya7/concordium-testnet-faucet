@@ -7,6 +7,7 @@ import { useMediaQuery } from "usehooks-ts";
 
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { SingleInputForm } from "@/components/SingleInpuForm";
+import { Step } from "@/components/Step";
 import getLatestTransactions from "@/lib/getLatestTransactions";
 import { extractITweetdFromUrl, formatTimestamp, formatTxHash } from "@/lib/utils";
 
@@ -158,9 +159,7 @@ export default function Home() {
       </div>
       <div className="flex-1 flex flex-col items-center w-full gap-4 px-4 py-8 sm:p-14 text-sm sm:text-base">
         <p className="mb-4">Get free CDDs for testing your dApps!</p>
-        <div className="border border-[--dark-blue] rounded-full h-9 w-9 flex items-center justify-center">
-          <p className="font-semibold">1</p>
-        </div>  
+        <Step step={1}/>
         <SingleInputForm
           inputValue={address}
           handleInputValue={handleAddressChange}
@@ -173,9 +172,7 @@ export default function Home() {
         {addressValidationError && (
           <p className="text-xs text-red-700 h-fit -mt-2">{addressValidationError}</p>
         )}
-        <div className="border border-[--dark-blue] rounded-full h-9 w-9 flex items-center justify-center mt-4">
-          <p className="font-semibold">2</p>
-        </div>
+        <Step step={2}/>
         <SingleInputForm
           inputValue={tweetPostedUrl}
           handleInputValue={handleTweetUrlChange}
@@ -185,6 +182,7 @@ export default function Home() {
           inputDisabled={!address || Boolean(addressValidationError) || isValidVerification}
           submitButtonDisabled={!isValidTweetUrl || isValidVerification}
         />
+        <Step step={3}/>
         <div className="w-full flex flex-col border border-[--dark-blue] max-w-xl mb-4 p-2 items-center justify-center min-h-[160px] text-xs sm:text-sm text-center">
         {isValidVerification ? (
           <>
