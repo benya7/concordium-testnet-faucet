@@ -8,6 +8,7 @@ import { useMediaQuery } from "usehooks-ts";
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { SingleInputForm } from "@/components/SingleInpuForm";
 import { Step } from "@/components/Step";
+import { TWEET_TEMPLATE } from "@/lib/constants";
 import getLatestTransactions from "@/lib/getLatestTransactions";
 import { extractITweetdFromUrl, formatTimestamp, formatTxHash } from "@/lib/utils";
 
@@ -48,11 +49,11 @@ export default function Home() {
     }
   };
 
-  const handlePostTweet = () => {
-    // const tweetTemplate = encodeURIComponent(`Excited to use testnet faucet! 🚀 Requesting 20,000 CCDs to power my blockchain experiments. ${address} Check it out! #Concordium #Blockchain #Testnet #Developers`);
-    const tweetTemplate = encodeURIComponent(`testing ${address} testing`)
-    window.open(`https://x.com/intent/tweet?text=${tweetTemplate}`, '_blank', 'width=500,height=500');
-  };
+  const handlePostTweet = () => window.open(
+    `https://x.com/intent/tweet?text=${encodeURIComponent(TWEET_TEMPLATE + " " + address)}`,
+    '_blank',
+    'width=500,height=500'
+  );
 
   const verifyTweet = async () => {
     try {
