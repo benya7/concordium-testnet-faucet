@@ -169,10 +169,12 @@ export default function Home() {
           submitButtonText="Post Tweet"
           inputDisabled={Boolean(tweetPostedUrl)}
           submitButtonDisabled={!address || (address && Boolean(addressValidationError)) || Boolean(tweetPostedUrl)}
-        />
-        {addressValidationError && (
-          <p className="text-xs text-red-700 h-fit -mt-2">{addressValidationError}</p>
-        )}
+        >
+          {addressValidationError && (
+            <p className="text-xs text-red-700 h-fit -mt-2">{addressValidationError}</p>
+          )}
+        </SingleInputForm>
+        
         <Step step={2}/>
         <SingleInputForm
           inputValue={tweetPostedUrl}

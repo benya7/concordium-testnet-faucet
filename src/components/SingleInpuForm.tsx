@@ -6,6 +6,7 @@ interface IProps {
   submitButtonText: string;
   inputDisabled?: boolean;
   submitButtonDisabled?: boolean;
+  children?: React.ReactNode;
 }
 
 export const SingleInputForm = ({
@@ -15,9 +16,10 @@ export const SingleInputForm = ({
   inputPlaceHolder,
   submitButtonText,
   inputDisabled,
-  submitButtonDisabled
+  submitButtonDisabled,
+  children
 }: IProps) => (
-  <div className="flex flex-col w-full max-w-xl gap-4 sm:flex-row sm:justify-center mt-1">
+  <div className="flex flex-col w-full max-w-xl gap-4 mt-1">
     <input
       type="text"
       placeholder={inputPlaceHolder}
@@ -26,8 +28,9 @@ export const SingleInputForm = ({
       disabled={inputDisabled}
       onChange={handleInputValue}
     />
+    {children}
     <button
-      className="bg-[--blue] px-2 py-1 min-h-10 font-semibold text-white hover:bg-[--blue-light] disabled:bg-gray-300 disabled:cursor-default w-28 self-center sm:self-auto sm:w-40 text-nowrap"
+      className="bg-[--blue] px-2 py-1 h-9 sm:h-10 font-semibold text-white hover:bg-[--blue-light] disabled:bg-gray-300 disabled:cursor-default w-28 self-center sm:w-40 text-nowrap"
       onClick={handleSubmitButton}
       disabled={submitButtonDisabled}
     >
