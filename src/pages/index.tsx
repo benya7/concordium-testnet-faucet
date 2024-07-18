@@ -16,8 +16,9 @@ import { extractITweetdFromUrl, formatTimestamp, formatTxHash } from "@/lib/util
 
 import poweredByConcordium from "../../public/powered_by_concordium_light.png";
 
-
 const IBMPlexMono = IBM_Plex_Mono({ weight: ["400", "600", "700"], subsets: ["latin"], display: "swap", variable: "--font-ibm-plex-mono"});
+
+
 
 
 export default function Home() {
@@ -33,7 +34,7 @@ export default function Home() {
   const [transactionHash, setTransactionHash] = useState<string | undefined>();
   
   const [error, setError] = useState<string | undefined>();
-  const isMobile = useMediaQuery('(max-width: 640px)')
+  const isXl = useMediaQuery('(max-width: 768px)')
   
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => setAddress(e.target.value);
 
@@ -154,75 +155,86 @@ export default function Home() {
   }, []);
 
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between ${IBMPlexMono.className}`}
-    >
+    <div className={`min-h-screen ${IBMPlexMono.className}`}>
       <Head>
         <title>Concordium Testnet Faucet</title>
       </Head>
-      <div className="h-24 w-full bg-[--teal] flex items-center justify-center sm:justify-between sm:px-10">
-        <p className="text-xl sm:text-2xl text-center font-semibold text-white">Concordium Testnet Faucet</p>
-      </div>
-      <div className="flex-1 flex flex-col items-center w-full gap-4 px-4 py-8 sm:p-14 text-sm sm:text-base">
-        <p className="mb-4">Get free CDDs for testing your dApps!</p>
-        <Step step={1}/>
-        <SingleInputForm
-          inputValue={address}
-          handleInputValue={handleAddressChange}
-          handleSubmitButton={handlePostTweet}
-          inputPlaceHolder="Enter your testnet CCD address"
-          submitButtonText="Post Tweet"
-          inputDisabled={Boolean(tweetPostedUrl)}
-          submitButtonDisabled={!address || (address && Boolean(addressValidationError)) || Boolean(tweetPostedUrl)}
-        >
-          {addressValidationError && (
-            <p className="text-xs text-red-700 h-fit -mt-2">{addressValidationError}</p>
-          )}
-        </SingleInputForm>
-        
-        <Step step={2}/>
-        <SingleInputForm
-          inputValue={tweetPostedUrl}
-          handleInputValue={handleTweetUrlChange}
-          handleSubmitButton={handleVerifyTweetAndSendTokens}
-          inputPlaceHolder="Enter your tweet link"
-          submitButtonText="Verify"
-          inputDisabled={!address || Boolean(addressValidationError) || isValidVerification}
-          submitButtonDisabled={!isValidTweetUrl || isValidVerification}
-        />
-        <Step step={3}/>
-        <div className="w-full flex flex-col border border-[--dark-blue] max-w-xl mb-4 p-2 items-center justify-center min-h-[160px] text-xs sm:text-sm text-center">
-        {isValidVerification ? (
-          <>
-            <p className="mb-1">Tweet Verified Succesfully ✅</p>
-            { !transactionHash ? <p>Sending token to your address..</p> : <>
-              <p className="mb-1">Tokens Sent ✅</p>
-              <p className="mb-1">{`Tx Hash: ${isMobile ? formatTxHash(transactionHash) : transactionHash}`}</p>
-            </>}
-          </>
-          ) : <p>Pending to verify.</p>}
+    <div className="h-24 w-full bg-[--teal] flex items-center justify-center sm:justify-between sm:px-10">
+      <p className="text-xl sm:text-2xl text-center font-semibold text-white">Concordium Testnet Faucet</p>
+    </div>
+    <main className="flex flex-col items-center justify-between py-8 sm:py-10">
+      <p className="mb-4 md:mb-8">Get free CDDs for testing your dApps!</p>
+      <div className="flex-1 flex flex-col md:flex-row justify-center md:w-full text-sm sm:text-base px-4 gap-4 md:gap-8 lg:gap-12">
+        <div id="phases" className="flex flex-col items-center justify-between gap-4 md:w-[45%] max-w-xl">
+          <Step step={1}/>
+          <SingleInputForm
+            inputValue={address}
+            handleInputValue={handleAddressChange}
+            handleSubmitButton={handlePostTweet}
+            inputPlaceHolder="Enter your testnet CCD address"
+            submitButtonText="Share on X"
+            inputDisabled={Boolean(tweetPostedUrl)}
+            submitButtonDisabled={!address || (address && Boolean(addressValidationError)) || Boolean(tweetPostedUrl)}
+          >
+            {addressValidationError && (
+              <p className="text-xs text-red-700 h-fit -mt-2">{addressValidationError}</p>
+            )}
+          </SingleInputForm>
+          <Step step={2}/>
+          <SingleInputForm
+            inputValue={tweetPostedUrl}
+            handleInputValue={handleTweetUrlChange}
+            handleSubmitButton={handleVerifyTweetAndSendTokens}
+            inputPlaceHolder="Enter your X Post link"
+            submitButtonText="Verify"
+            inputDisabled={!address || Boolean(addressValidationError) || isValidVerification}
+            submitButtonDisabled={!isValidTweetUrl || isValidVerification}
+          />
+          <Step step={3}/>
+          <div className="w-full flex flex-col border border-[--dark-blue] max-w-xl mb-4 p-2 items-center justify-center min-h-[128px] text-xs sm:text-sm text-center">
+          {isValidVerification ? (
+            <>
+              <p className="mb-1">X Post Verified Succesfully ✅</p>
+              { !transactionHash ? <p>Sending token to your address..</p> : <>
+                <p className="mb-1">Tokens Sent ✅</p>
+                <a
+                  className="hover:cursor-pointer"
+                  href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/transaction/${transactionHash}`}
+                  target="_blank"
+                >
+                  <p>Tx Hash: {`${isXl ? formatTxHash(transactionHash) : transactionHash}`}</p>
+                </a>
+              </>}
+            </>
+            ) : <p>Pending to verify.</p>}
           </div>
-        <p className="mt-8">Latest transactions:</p>
-        <div className="bg-white relative border border-[--dark-blue] overflow-auto w-full flex flex-col max-w-xl mb-4 min-h-[288px] text-xs sm:text-sm">
-          { latestTransactions.length > 0 ?
-            latestTransactions.map(tx => (
-              <div key={tx.transactionHash}  className="border-b last:border-none py-2 mx-2">
-                <p>{`Date: ${formatTimestamp(tx.blockTime)}`}</p>
-                <p>{`Tx Hash: ${isMobile ? formatTxHash(tx.transactionHash) : tx.transactionHash}`}</p>
-              </div>
-            )) :
-            <p className="absolute inset-0 text-gray-400 text-center place-content-center">No transactions found.</p>
-          }
+        </div>
+        <div id="latest-transactions" className="flex flex-col items-center justify-between gap-4 md:w-[45%] max-w-xl">
+          <p>Latest transactions:</p>
+          <div className="flex-1 bg-white relative border border-[--dark-blue] overflow-auto w-full flex flex-col max-w-xl mb-4 min-h-[288px] text-xs sm:text-sm">
+            { latestTransactions.length > 0 ?
+              latestTransactions.map(tx => (
+                <div key={tx.transactionHash}  className="border-b last:border-none py-4 mx-2">
+                  <p>{`Date: ${formatTimestamp(tx.blockTime)}`}</p>
+                  <a
+                    className="hover:cursor-pointer"
+                    href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/transaction/${tx.transactionHash}`}
+                    target="_blank"
+                  >
+                    <p>Tx Hash: {`${isXl ? formatTxHash(tx.transactionHash) : tx.transactionHash}`}</p>
+                  </a>
+                </div>
+              )) :
+              <p className="absolute inset-0 text-gray-400 text-center place-content-center">No transactions found.</p>
+            }
+          </div>
         </div>
       </div>
-      <div className="h-32 w-full bg-[--blue-sapphire] flex items-center justify-center sm:px-10">
-        <Image src={poweredByConcordium} alt="powered by" className="w-64 sm:w-72" />
-      </div>
-      {error && <ErrorAlert
-        errorText={error}
-        onClose={() => setError(undefined)}
-      />}
-
     </main>
+    <div className="h-32 w-full bg-[--blue-sapphire] flex items-center justify-center sm:px-10">
+        <Image src={poweredByConcordium} alt="powered by" className="w-64 sm:w-72" />
+    </div>
+    {error && <ErrorAlert errorText={error} onClose={() => setError(undefined)}/>}
+    </div>
   );
 }
