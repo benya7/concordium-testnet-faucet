@@ -11,4 +11,4 @@ export const extractITweetdFromUrl = (url: string): string | null => {
 }
 export const formatTimestamp = (timestamp: number): string => format(fromUnixTime(timestamp), "yyyy-MM-dd HH:mm:ss");
 
-export const formatTxHash = (txHash: string): string => `${txHash.substring(0, 22)}...${txHash.substring(txHash.length - 22)}`
+export const formatTxHash = (txHash: string): string => `${txHash.substring(0, 12)}...${txHash.substring(txHash.length - 12)}`
