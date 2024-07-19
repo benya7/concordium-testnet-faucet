@@ -12,10 +12,12 @@ import { SingleInputForm } from "@/components/SingleInpuForm";
 import { Step } from "@/components/Step";
 import { TWEET_TEMPLATE } from "@/lib/constants";
 import getLatestTransactions from "@/lib/getLatestTransactions";
+import isWithinUsageLimit from "@/lib/isWithinUsageLimit";
 import { extractITweetdFromUrl, formatTimestamp, formatTxHash } from "@/lib/utils";
 
 import concordiumLogo from "../../public/concordium-logo-back.svg"
 import poweredByConcordium from "../../public/powered_by_concordium_light.png";
+
 
 const IBMPlexMono = IBM_Plex_Mono({ weight: ["400", "600", "700"], subsets: ["latin"], display: "swap", variable: "--font-ibm-plex-mono"});
 
@@ -124,16 +126,28 @@ export default function Home() {
   };
   
   useEffect(() => {
-    if (!address) {
-      setAddressValidationError(undefined)
-      return
-    }
-    try {
-      AccountAddress.fromBase58(address);
-      setAddressValidationError(undefined)
-    } catch (error) {
-      setAddressValidationError("Invalid address. Please insert a valid one.")
-    }
+    const checkUsageLimit = async () => {
+      if (!address) {
+        setAddressValidationError(undefined);
+        return;
+      }
+
+      try {
+        AccountAddress.fromBase58(address);
+        setAddressValidationError(undefined);
+        
+        // Llama a la función async y espera su resultado
+        const isAllowed = await isWithinUsageLimit(address);
+
+        if (!isAllowed) {
+          setAddressValidationError(`You already get tokens in the last ${Number(process.env.NEXT_PUBLIC_USAGE_LIMIT_IN_DAYS) * 24} hours. Please try again later.`);
+        }
+      } catch (error) {
+        setAddressValidationError("Invalid address. Please insert a valid one.");
+      }
+    };
+
+    checkUsageLimit();
   }, [address])
 
   useEffect(() => {
@@ -169,7 +183,9 @@ export default function Home() {
       <p className="text-xl md:text-2xl text-center font-semibold text-white">Concordium Testnet Faucet</p>
     </div>
     <main className="flex flex-col items-center justify-between py-8 sm:py-10">
-      <p className="text-center text-sm md:text-base mb-4 md:mb-8 px-4">Get Tesnet CDDs every 24 hours for testing your dApps!</p>
+      <p className="text-center text-sm md:text-base mb-4 md:mb-8 px-4">
+        {`Get Tesnet CDDs every ${Number(process.env.NEXT_PUBLIC_USAGE_LIMIT_IN_DAYS) * 24} hours for testing your dApps!`}
+      </p>
       <div className="flex-1 flex flex-col md:flex-row justify-center md:w-full text-sm md:text-base px-4 gap-2 md:gap-6 lg:gap-12">
         <div id="phases" className="flex flex-col items-center justify-between gap-4 md:w-[45%] max-w-xl">
           <Step step={1}/>
