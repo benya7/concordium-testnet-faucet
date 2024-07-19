@@ -6,7 +6,7 @@ export default function Challenge() {
   return (
     <div className='min-h-screen bg-[--off-white] flex items-center justify-center'>
       <Turnstile
-        options={{ theme: "light" }}
+        options={{ theme: "light", appearance: "interaction-only"}}
         siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY as string}
         onSuccess={() => router.push("/app")}
       />
