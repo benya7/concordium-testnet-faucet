@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { AccountAddress } from "@concordium/web-sdk";
-import { Metadata } from "next";
+import { GetServerSideProps } from "next";
 import { IBM_Plex_Mono } from "next/font/google";
 import Head from "next/head";
 import Image from "next/image";
@@ -267,4 +267,20 @@ export default function Home() {
     {error && <ErrorAlert errorText={error} onClose={() => setError(undefined)}/>}
     </div>
   );
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const referer = context.req.headers.referer;
+  if (!referer || !referer.endsWith('/')) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false
+      },
+    };
+  } else {
+    return {
+      props: {},
+    };
+  }
 }
