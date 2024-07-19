@@ -125,25 +125,28 @@ export default function Home() {
     }
   };
   
-  useEffect(() => {
-    const checkUsageLimit = async () => {
-      if (!address) {
-        setAddressValidationError(undefined);
-        return;
-      }
+  useEffect(() => {      
+    if (!address) {
+      setAddressValidationError(undefined);
+      return;
+    }
+    try {
+      AccountAddress.fromBase58(address);
+      setAddressValidationError(undefined);
+      
+    } catch (error) {
+      setAddressValidationError("Invalid address. Please insert a valid one.");
+    }
 
+    const checkUsageLimit = async () => {
       try {
-        AccountAddress.fromBase58(address);
-        setAddressValidationError(undefined);
-        
-        // Llama a la función async y espera su resultado
         const isAllowed = await isWithinUsageLimit(address);
 
         if (!isAllowed) {
           setAddressValidationError(`You already get tokens in the last ${Number(process.env.NEXT_PUBLIC_USAGE_LIMIT_IN_DAYS) * 24} hours. Please try again later.`);
         }
       } catch (error) {
-        setAddressValidationError("Invalid address. Please insert a valid one.");
+        console.log("Error on checkUsageLimit", error)
       }
     };
 
