@@ -188,12 +188,12 @@ export default function Home() {
     <div className="h-24 w-full bg-[--teal] flex items-center justify-center sm:px-10">
       <p className="text-xl md:text-2xl text-center font-semibold text-white">Concordium Testnet Faucet</p>
     </div>
-    <main className="flex flex-col items-center justify-between py-8 sm:py-10">
+    <main className="flex flex-col items-center justify-between py-8 md:pt-12 md:pb-28">
       <p className="text-center text-sm md:text-base mb-4 md:mb-8 px-10">
         {`Get Tesnet CDDs every ${Number(process.env.NEXT_PUBLIC_USAGE_LIMIT_IN_DAYS) * 24} hours for testing your dApps!`}
       </p>
-      <div className="flex-1 flex flex-col md:flex-row justify-center md:w-full text-sm md:text-base px-4 gap-2 md:gap-6 lg:gap-12">
-        <div id="phases" className="flex flex-col items-center justify-between gap-4 md:w-[45%] max-w-xl">
+      <div className="flex flex-col md:flex-row justify-center md:w-full text-sm md:text-base px-4 gap-6 lg:gap-12">
+        <div id="phases" className="h-fit flex flex-col items-center md:w-[45%] max-w-xl">
           <Step step={1}/>
           <SingleInputForm
             inputValue={address}
@@ -222,7 +222,7 @@ export default function Home() {
             submitButtonDisabled={!isValidTweetUrl || isValidVerification || isVerifyLoading}
           />
           <Step step={3}/>
-          <div className="w-full flex flex-col border border-[--dark-blue] rounded-md max-w-xl mb-4 p-2 items-center justify-center min-h-[140px] text-xs md:text-sm text-center font-semibold">
+          <div className="w-full flex flex-col border border-[--dark-blue] rounded-md max-w-xl p-2 items-center justify-center min-h-[160px] text-xs md:text-sm text-center font-semibold">
           {isValidVerification ? (
             <>
               <p className="mb-1">X Post Verified Succesfully ✅</p>
@@ -243,12 +243,12 @@ export default function Home() {
             </>}
           </div>
         </div>
-        <div id="latest-transactions" className="flex flex-col items-center justify-between gap-4 md:w-[45%] max-w-xl">
+        <div id="latest-txs-and-faq" className="flex flex-col items-center gap-4 md:w-[45%] max-w-xl">
           <p>Latest transactions:</p>
-          <div className="flex-1 relative border border-[--dark-blue] rounded-md overflow-auto w-full flex flex-col max-w-xl mb-4 min-h-[288px] justify-evenly gap-1 py-1 text-xs md:text-sm">
+          <div className="relative border border-[--dark-blue] rounded-md overflow-auto w-full flex flex-col max-w-xl min-h-[256px] max-h-[256px] md:max-h-[268px] justify-evenly gap-1 py-1 text-xs md:text-sm">
             { latestTransactions.length > 0 ?
               latestTransactions.map(tx => (
-                <div key={tx.transactionHash}  className="bg-white p-2 mx-2 flex rounded-md">
+                <div key={tx.transactionHash}  className="bg-white p-1 mx-1 flex rounded-md h-20 md:h-24">
                   <Image src={concordiumLogo} alt="concordium-logo" className="bg-[--teal] p-2 rounded-md" />
                   <div className="p-2 font-semibold">
                     <p>Date: <span className="font-normal">{formatTimestamp(tx.blockTime)}</span></p>
@@ -266,28 +266,28 @@ export default function Home() {
               <p className="absolute inset-0 text-gray-400 text-center place-content-center">No transactions found.</p>
             }
           </div>
-        </div>
-      </div>
-      <p className="text-center text-sm md:text-base mt-6 mb-4">Frequently Asked Questions</p>
-      <div className="h-fit max-w-xl w-full px-4 text-xs md:text-sm">
-        <div className="mx-auto w-full max-w-lg divide-y divide-black/5 border border-[--dark-blue] rounded-md">
-        {
-          FAQ.map((item, questionIndex) => (
-          <Disclosure key={questionIndex} as="div" className="px-6 py-4" defaultOpen={false}>
-            <DisclosureButton className="group flex w-full items-center justify-between">
-              <span className="text-black group-data-[hover]:text-black/80">
-                {item.question}
-              </span>
-              <p className="size-5 fill-black/60 group-data-[hover]:fill-black/50 group-data-[open]:rotate-180">^</p>
-            </DisclosureButton>
-            <DisclosurePanel className="mt-2 px-1 space-y-2 text-black/60">
-            {item.response.split("\n").map((responseText, reponseLineIndex) => (
-              <p key={`${questionIndex}-${reponseLineIndex}`}>{responseText}</p>
-            ))}
-            </DisclosurePanel>
-          </Disclosure>
-          ))
-        }
+          <p className="mt-4 md:mt-8">Frequently Asked Questions</p>
+          <div className="max-w-xl w-full text-xs md:text-sm">
+            <div className="mx-auto w-full divide-y divide-black/5 border border-[--dark-blue] rounded-md">
+            {
+              FAQ.map((item, questionIndex) => (
+              <Disclosure key={questionIndex} as="div" className="px-6 py-4" defaultOpen={false}>
+                <DisclosureButton className="group flex w-full items-center justify-between">
+                  <span className="text-black group-data-[hover]:text-black/80">
+                    {item.question}
+                  </span>
+                  <p className="size-5 fill-black/60 group-data-[hover]:fill-black/50 group-data-[open]:rotate-180">^</p>
+                </DisclosureButton>
+                <DisclosurePanel className="mt-2 px-1 space-y-2 text-black/60">
+                {item.response.split("\n").map((responseText, reponseLineIndex) => (
+                  <p key={`${questionIndex}-${reponseLineIndex}`}>{responseText}</p>
+                ))}
+                </DisclosurePanel>
+              </Disclosure>
+              ))
+            }
+            </div>
+          </div>
         </div>
       </div>
     </main>

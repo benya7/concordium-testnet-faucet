@@ -30,7 +30,7 @@ export const SingleInputForm = ({
     />
     {children}
     <button
-      className="bg-[--blue] px-2 py-1 h-9 md:h-10 font-semibold text-white rounded-md hover:bg-[--blue-light] disabled:bg-gray-300 disabled:cursor-default w-28 self-center sm:w-36 text-nowrap"
+      className="bg-[--blue] px-2 py-1 h-9 md:h-10 font-semibold text-white rounded-md hover:bg-[--blue-light] disabled:bg-gray-300 disabled:cursor-default w-28 self-center sm:w-36 text-nowrap mb-6"
       onClick={handleSubmitButton}
       disabled={submitButtonDisabled}
     >
