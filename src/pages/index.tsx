@@ -192,7 +192,7 @@ export default function Home() {
       <p className="text-center text-sm md:text-base mb-4 md:mb-8 px-10">
         {`Get Tesnet CDDs every ${Number(process.env.NEXT_PUBLIC_USAGE_LIMIT_IN_DAYS) * 24} hours for testing your dApps!`}
       </p>
-      <div className="flex flex-col md:flex-row justify-center items-center w-full text-sm md:text-base px-4 gap-6 lg:gap-12">
+      <div className="flex flex-col md:flex-row justify-center items-center md:items-start w-full text-sm md:text-base px-4 gap-6 lg:gap-12">
         <div id="phases" className="h-fit flex flex-col items-center md:w-[45%] max-w-lg md:max-w-xl w-full">
           <Step step={1}/>
           <SingleInputForm
