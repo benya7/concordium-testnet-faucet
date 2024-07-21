@@ -273,7 +273,7 @@ export default function Home() {
         <div className="mx-auto w-full max-w-lg divide-y divide-black/5 border border-[--dark-blue] rounded-md">
         {
           FAQ.map((item, questionIndex) => (
-          <Disclosure key={questionIndex} as="div" className="px-6 py-4" defaultOpen={true}>
+          <Disclosure key={questionIndex} as="div" className="px-6 py-4" defaultOpen={false}>
             <DisclosureButton className="group flex w-full items-center justify-between">
               <span className="text-black group-data-[hover]:text-black/80">
                 {item.question}
@@ -288,7 +288,6 @@ export default function Home() {
           </Disclosure>
           ))
         }
-
         </div>
       </div>
     </main>
