@@ -269,7 +269,7 @@ export default function Home() {
         </div>
       </div>
       <p className="text-center text-sm md:text-base mt-6 mb-4">Frequently Asked Questions</p>
-      <div className="h-fit max-w-lg w-full px-4 text-xs md:text-sm">
+      <div className="h-fit max-w-xl w-full px-4 text-xs md:text-sm">
         <div className="mx-auto w-full max-w-lg divide-y divide-black/5 border border-[--dark-blue] rounded-md">
         {
           FAQ.map((item, questionIndex) => (
