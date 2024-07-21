@@ -32,3 +32,5 @@ interface TransactionsResponse {
 }
 
 type PartialTransaction = Pick<Transaction, 'blockTime' | 'transactionHash'>;
+
+type CloudfareWidgetStatus = 'solved' | 'error' | 'expired' | null;

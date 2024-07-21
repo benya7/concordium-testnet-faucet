@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@concordium/web-sdk": "^7.5.0",
+    "@headlessui/react": "^2.1.2",
     "@marsidev/react-turnstile": "^0.7.2",
     "date-fns": "^3.6.0",
     "next": "14.2.5",

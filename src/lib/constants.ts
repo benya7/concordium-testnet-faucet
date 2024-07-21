@@ -1,1 +1,0 @@
-export const TWEET_TEMPLATE = "Excited to use the testnet faucet! 🚀 Requesting CCD tokens to power my blockchain experiments. Check it out! #Concordium #Blockchain #Testnet"
