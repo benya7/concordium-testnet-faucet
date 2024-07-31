@@ -1,6 +1,6 @@
 # concordium-testnet-faucet
 
-## Development
+## Development
 
 Create the .env.local file and fill up the variables.
 
@@ -9,6 +9,7 @@ cp .env.example .env.local
 ```
 
 Example enviroment variable values
+
 ```bash
 NEXT_PUBLIC_EXPLORER_API_URL=https://wallet-proxy.testnet.concordium.com/v1
 NEXT_PUBLIC_EXPLORER_URL=https://ccdexplorer.io/
@@ -19,6 +20,6 @@ NODE_URL=node.testnet.concordium.com
 NODE_PORT=20000
 CCD_DEFAULT_AMOUNT=1
 SENDER_PRIVATE_KEY=12...34
-
 ```
-> Note: the `3x00000000000000000000FF` value in the NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY is a site key provided by Cloudfare for testing purporses, it works fine in local. For setup the Cloudfare Turnstile service in produccion please refer to this [guide](docs/turnstile/SETUP.md),
+
+Note: the `3x00000000000000000000FF` value in the NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY is a site key provided by Cloudfare for testing purporses, it works fine in local. For setup the Cloudfare Turnstile service in produccion please refer to this [guide](docs/turnstile/SETUP.md).
