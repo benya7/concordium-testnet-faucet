@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { AccountAddress } from "@concordium/web-sdk";
-import { Description, Dialog, DialogBackdrop, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { IBM_Plex_Mono } from "next/font/google";
 import Head from "next/head";
@@ -31,7 +31,7 @@ export default function Home() {
   const [addressValidationError, setAddressValidationError] = useState<string | undefined>();
 
   const [tweetPostedUrl, setTweetPostedUrl] = useState('');
-  const [tweetPostedId, setTweetPostedId] = useState<string | undefined>();
+  const [XPostId, SetXPostId] = useState<string | undefined>();
 
   const [isValidTweetUrl, setIsValidTweetUrl] = useState<boolean | undefined>();
   const [isValidVerification, setIsValidVerification] = useState<boolean | undefined>();
@@ -55,7 +55,7 @@ export default function Home() {
       setIsValidTweetUrl(false)
     } else {
       setIsValidTweetUrl(true)
-      setTweetPostedId(tweetId)
+      SetXPostId(tweetId)
     }
   };
 
@@ -65,32 +65,14 @@ export default function Home() {
     'width=500,height=500'
   );
 
-  const verifyTweet = async () => {
+  const validateAndClaim = async () => {
     try {
-      const response = await fetch('/api/verifyTweet', {
+      const response = await fetch('/api/validateAndClaim', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ tweetPostedId, address }),
-      });
-  
-      const data = await response.json();
-  
-      return { ok: response.ok, data };
-    } catch (error) {
-      throw new Error("Network error. Please check your connection.");
-    }
-  };
-  
-  const sendTokens = async () => {
-    try {
-      const response = await fetch('/api/sendTokens', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sender: process.env.NEXT_PUBLIC_SENDER_ADDRESS, receiver: address }),
+        body: JSON.stringify({ XPostId, sender: process.env.NEXT_PUBLIC_SENDER_ADDRESS, receiver: address }),
       });
   
       const data = await response.json();
@@ -105,22 +87,16 @@ export default function Home() {
     setTurnstileOpen(false)
     setIsVerifyLoading(true)
     try {
-      const { ok: verifyOk, data: verifyData } = await verifyTweet();
+      const response = await validateAndClaim();
   
-      if (verifyOk) {
-        setIsValidVerification(verifyData.isValid);
-        await new Promise(resolve => setTimeout(resolve, 2000))
-        const { ok: sendOk, data: sendData } = await sendTokens();
+      if (response.ok) {
+        setIsValidVerification(true);
         await new Promise(resolve => setTimeout(resolve, 15000))
-        if (sendOk) {
-          setTransactionHash(sendData.transactionHash);
-        } else {
-          setError(sendData.error);
-        }
+        setTransactionHash(response.data.transactionHash);
       } else {
         setIsValidVerification(false);
         setIsVerifyLoading(false)
-        setError(verifyData.error);
+        setError(response.data.error);
       }
     } catch (error: any) {
       setIsVerifyLoading(false)
@@ -151,9 +127,6 @@ export default function Home() {
     } catch (error) {
       setAddressValidationError("Invalid address. Please insert a valid one.");
     }
-
-   
-
   }, [address])
 
   useEffect(() => {
@@ -190,7 +163,7 @@ export default function Home() {
     </div>
     <main className="flex flex-col items-center justify-between py-8 md:pt-12 md:pb-28 w-full">
       <p className="text-center text-sm md:text-base mb-4 md:mb-8 px-10">
-        {`Get Tesnet CDDs every ${Number(process.env.NEXT_PUBLIC_USAGE_LIMIT_IN_DAYS) * 24} hours for testing your dApps!`}
+        {`Get Testnet CDDs every ${Number(process.env.NEXT_PUBLIC_USAGE_LIMIT_IN_DAYS) * 24} hours for testing your dApps!`}
       </p>
       <div className="flex flex-col md:flex-row justify-center items-center md:items-start w-full text-sm md:text-base px-4 gap-6 lg:gap-12">
         <div id="phases" className="h-fit flex flex-col items-center md:w-[45%] max-w-lg md:max-w-xl w-full">
